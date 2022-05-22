@@ -5,6 +5,8 @@ import { typeOrmConfigAsync } from './config/typeorm.config';
 import { TypeOrmExModule } from './database/typeorm-ex.module';
 import { MeetsModule } from './meets/meets.module';
 import { MeetRepository } from './meets/orm/meet.repository';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { MeetRepository } from './meets/orm/meet.repository';
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     TypeOrmExModule.forCustomRepository([MeetRepository]),
     MeetsModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
