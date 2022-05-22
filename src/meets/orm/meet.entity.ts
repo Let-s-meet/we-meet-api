@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { MeetStatus } from '../enum/meet-status.enum';
 
 @Entity()
 export class Meet extends BaseEntity {
@@ -23,4 +24,7 @@ export class Meet extends BaseEntity {
 
   @Column()
   description: string;
+
+  @Column()
+  public status: MeetStatus;
 }
