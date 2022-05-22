@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsDateString,
+  IsInt,
+  IsNotEmpty,
+  IsNumberString,
+  IsString,
+  MinDate,
+  MinLength,
+} from 'class-validator';
 
 export class MeetCreationDto {
   @IsString()
@@ -9,4 +17,16 @@ export class MeetCreationDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  @IsNotEmpty()
+  @IsDateString()
+  start: Date;
+
+  @IsNotEmpty()
+  @IsDateString()
+  end: Date;
+
+  @IsNotEmpty()
+  @IsNumberString()
+  seats: number;
 }

@@ -11,20 +11,32 @@ import { MeetStatus } from '../enum/meet-status.enum';
 @Entity()
 export class Meet extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  public id: string;
 
   @CreateDateColumn()
-  created: Date;
+  public created: Date;
 
   @UpdateDateColumn()
-  updated: Date;
+  public updated: Date;
 
   @Column()
-  name: string;
+  public name: string;
 
   @Column()
-  description: string;
+  public description: string;
 
   @Column()
   public status: MeetStatus;
+
+  @Column()
+  public start: Date;
+
+  @Column()
+  public end: Date;
+
+  @Column()
+  public seats: number;
+
+  @Column()
+  public available_seats: number;
 }

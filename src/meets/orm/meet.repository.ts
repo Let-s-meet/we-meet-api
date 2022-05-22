@@ -1,15 +1,10 @@
-import {
-  ConflictException,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { MeetCreationDto } from '../dto/meet-creation.dto';
 import { MeetPaginatedResultsDto } from '../dto/meet-paginated-results.dto';
 import { MeetPaginationDto } from '../dto/meet-pagination.dto';
 import { MeetStatus } from '../enum/meet-status.enum';
-import { MeetStatusValidationPipe } from '../pipes/meet-status-validation.pipe';
 import { Meet } from './meet.entity';
 
 @CustomRepository(Meet)
@@ -67,10 +62,19 @@ export class MeetRepository extends Repository<Meet> {
    */
   async createMeet(meetCreationDto: MeetCreationDto): Promise<Meet> {
     const meet = new Meet();
-    const { name, description } = meetCreationDto;
+    const { name, description, start, end, seats } = meetCreationDto;
 
     meet.name = name;
     meet.description = description;
+
+    // Meet Dates
+    meet.start = start;
+    meet.end = end;
+
+    // Meet Seats
+    meet.seats = seats;
+    meet.available_seats = seats;
+
     meet.status = MeetStatus.ACTIVE;
 
     try {
