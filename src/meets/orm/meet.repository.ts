@@ -1,6 +1,11 @@
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
-import { Repository } from 'typeorm';
+import { User } from 'src/users/orm/user.entity';
+import { EntityNotFoundError, Repository } from 'typeorm';
 import { MeetCreationDto } from '../dto/meet-creation.dto';
 import { MeetPaginatedResultsDto } from '../dto/meet-paginated-results.dto';
 import { MeetPaginationDto } from '../dto/meet-pagination.dto';
@@ -28,6 +33,7 @@ export class MeetRepository extends Repository<Meet> {
     const query = this.createQueryBuilder('meet')
       .offset(page ? skippedItems : 0)
       .limit(perPage ? perPage : null)
+      .leftJoin('meet.attendees', 'attendee')
       .orderBy('meet.created', 'DESC');
 
     if (status) {
@@ -54,18 +60,43 @@ export class MeetRepository extends Repository<Meet> {
     }
   }
 
+  async getMeetById(id: string) {
+    const query = this.createQueryBuilder('meet')
+      .leftJoin('meet.attendees', 'attendee')
+      .select(['meet', 'attendee.id', 'attendee.username'])
+      .where('meet.id = :id', { id: id });
+
+    try {
+      return await query.getOneOrFail();
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        this.logger.error(`Meet ${id} not found`);
+        throw new BadRequestException(`Meet ${id} not found`);
+      } else {
+        console.log(error);
+        throw new InternalServerErrorException(
+          `An exception occured while fetching meet ${id}`,
+        );
+      }
+    }
+  }
+
   /**
    * Create a new Proejct
    *
    * @param meetCreationDto
    * @returns
    */
-  async createMeet(meetCreationDto: MeetCreationDto): Promise<Meet> {
+  async createMeet(
+    meetCreationDto: MeetCreationDto,
+    user: User,
+  ): Promise<Meet> {
     const meet = new Meet();
     const { name, description, start, end, seats } = meetCreationDto;
 
     meet.name = name;
     meet.description = description;
+    meet.creator = user;
 
     // Meet Dates
     meet.start = start;
@@ -84,6 +115,33 @@ export class MeetRepository extends Repository<Meet> {
     } catch (error) {
       this.logger.error(error.stack);
       throw new InternalServerErrorException();
+    }
+  }
+
+  async joinMeet(id: string, user: User) {
+    const meet = await this.findOneBy({ id: id });
+
+    if (meet.available_seats > 0) {
+      try {
+        await this.createQueryBuilder('meet')
+          .relation(Meet, 'attendees')
+          .of(meet)
+          .add(user);
+
+        meet.available_seats = meet.available_seats - 1;
+        await meet.save();
+
+        this.logger.verbose(
+          `User w/ id ${user.id} joined meet w/ id ${meet.id}`,
+        );
+      } catch (error) {
+        console.log(error.message);
+        throw new InternalServerErrorException();
+      }
+    } else {
+      this.logger.verbose(
+        `User w/ id ${user.id} cannot join meet w/ id ${meet.id}: No Remaining Seats`,
+      );
     }
   }
 }

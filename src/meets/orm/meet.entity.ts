@@ -1,8 +1,12 @@
+import { User } from 'src/users/orm/user.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -39,4 +43,14 @@ export class Meet extends BaseEntity {
 
   @Column()
   public available_seats: number;
+
+  @ManyToOne(() => User, (user) => user.createdMeets, { eager: false })
+  public creator: User;
+
+  @Column()
+  public creatorId: string;
+
+  @ManyToMany(() => User)
+  @JoinTable({ name: 'meet_users' })
+  public attendees: User[];
 }

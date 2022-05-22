@@ -1,5 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { User } from 'src/users/orm/user.entity';
 import { MeetCreationDto } from './dto/meet-creation.dto';
 import { MeetPaginatedResultsDto } from './dto/meet-paginated-results.dto';
 import { MeetPaginationDto } from './dto/meet-pagination.dto';
@@ -23,19 +25,18 @@ export class MeetsService {
   }
 
   async getMeetById(id: string): Promise<Meet> {
-    const found = await this.meetRepository.findOne({
-      where: { id },
-    });
-
-    if (!found) {
-      throw new NotFoundException(`Meet with ID "${id}" not found`);
-    }
-
-    return found;
+    return this.meetRepository.getMeetById(id);
   }
 
-  async createMeet(meetCreationDto: MeetCreationDto): Promise<Meet> {
-    return this.meetRepository.createMeet(meetCreationDto);
+  async joinMeet(id: string, user: User) {
+    return this.meetRepository.joinMeet(id, user);
+  }
+
+  async createMeet(
+    meetCreationDto: MeetCreationDto,
+    user: User,
+  ): Promise<Meet> {
+    return this.meetRepository.createMeet(meetCreationDto, user);
   }
 
   async updateMeetStatus(id: string, status: MeetStatus): Promise<Meet> {

@@ -7,6 +7,7 @@ import { MeetsModule } from './meets/meets.module';
 import { MeetRepository } from './meets/orm/meet.repository';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module';
     MeetsModule,
     AuthModule,
     UsersModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
