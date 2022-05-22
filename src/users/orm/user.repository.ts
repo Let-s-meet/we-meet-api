@@ -20,17 +20,20 @@ export class UserRepository extends Repository<User> {
   async register(
     authCredentialsRegisterDto: AuthCredentialsRegisterDto,
   ): Promise<void> {
-    const { email, username, password } = authCredentialsRegisterDto;
-    const pirate = new User();
-    pirate.email = email;
-    pirate.username = username;
-    pirate.salt = await bcrypt.genSalt();
-    pirate.password = await this.hashPassword(password, pirate.salt);
-    pirate.active = true;
+    const { email, username, password, gender, birth } =
+      authCredentialsRegisterDto;
+    const user = new User();
+    user.email = email;
+    user.username = username;
+    user.gender = gender;
+    user.birth = birth;
+    user.salt = await bcrypt.genSalt();
+    user.password = await this.hashPassword(password, user.salt);
+    user.active = true;
 
     try {
-      await pirate.save();
-      this.logger.verbose(`User w/ id ${pirate.id} registered`);
+      await user.save();
+      this.logger.verbose(`User w/ id ${user.id} registered`);
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Username/Email already exists');

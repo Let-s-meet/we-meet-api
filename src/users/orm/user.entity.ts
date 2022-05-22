@@ -7,38 +7,45 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { UserGender } from '../enum/user-gender.enum';
 
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  public id: string;
 
   @CreateDateColumn()
-  created: Date;
+  public created: Date;
 
   @UpdateDateColumn()
-  updated: Date;
+  public updated: Date;
 
   @Column({ select: false, unique: true })
-  email: string;
+  public email: string;
 
   @Column({ unique: true })
-  username: string;
+  public username: string;
 
   @Column({ select: false })
-  password: string;
+  public password: string;
 
   @Column({ select: false })
-  salt: string;
+  public salt: string;
 
   @Column({ nullable: false, default: false })
-  active: boolean;
+  public active: boolean;
 
   @Column({ nullable: true })
-  lastSuccessfullLogin: Date;
+  public lastSuccessfullLogin: Date;
 
   @Column({ nullable: true })
-  avatar: string;
+  public avatar: string;
+
+  @Column({ nullable: true })
+  public birth: Date;
+
+  @Column({ nullable: true })
+  public gender: UserGender;
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);

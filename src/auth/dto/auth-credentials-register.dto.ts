@@ -1,10 +1,14 @@
 import {
+  IsDateString,
   IsEmail,
+  IsIn,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   MinLength,
 } from 'class-validator';
+import { UserGender } from 'src/users/enum/user-gender.enum';
 
 export class AuthCredentialsRegisterDto {
   @IsNotEmpty()
@@ -21,4 +25,17 @@ export class AuthCredentialsRegisterDto {
     message: 'The Password is too weak!',
   })
   password: string;
+
+  @IsOptional()
+  @IsDateString()
+  birth: Date;
+
+  @IsOptional()
+  @IsIn([
+    UserGender.FEMALE,
+    UserGender.MALE,
+    UserGender.OTHER,
+    UserGender.NORESPONSE,
+  ])
+  gender: UserGender;
 }
