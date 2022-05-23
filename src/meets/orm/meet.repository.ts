@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
@@ -63,7 +64,13 @@ export class MeetRepository extends Repository<Meet> {
   async getMeetById(id: string) {
     const query = this.createQueryBuilder('meet')
       .leftJoin('meet.attendees', 'attendee')
-      .select(['meet', 'attendee.id', 'attendee.username'])
+      .select([
+        'meet',
+        'attendee.id',
+        'attendee.username',
+        'attendee.gender',
+        'attendee.birth',
+      ])
       .where('meet.id = :id', { id: id });
 
     try {
@@ -135,13 +142,36 @@ export class MeetRepository extends Repository<Meet> {
           `User w/ id ${user.id} joined meet w/ id ${meet.id}`,
         );
       } catch (error) {
-        console.log(error.message);
-        throw new InternalServerErrorException();
+        if (error.code === '23505') {
+          throw new ConflictException('User Already joined the Meet');
+        } else {
+          console.log(error);
+          throw new InternalServerErrorException();
+        }
       }
     } else {
       this.logger.verbose(
         `User w/ id ${user.id} cannot join meet w/ id ${meet.id}: No Remaining Seats`,
       );
+    }
+  }
+
+  async leaveMeet(id: string, user: User) {
+    const meet = await this.findOneBy({ id: id });
+
+    try {
+      await this.createQueryBuilder('meet')
+        .relation(Meet, 'attendees')
+        .of(meet)
+        .remove(user);
+
+      meet.available_seats = meet.available_seats + 1;
+      await meet.save();
+
+      this.logger.verbose(`User w/ id ${user.id} left meet w/ id ${meet.id}`);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException();
     }
   }
 }

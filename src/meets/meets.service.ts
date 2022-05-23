@@ -32,6 +32,10 @@ export class MeetsService {
     return this.meetRepository.joinMeet(id, user);
   }
 
+  async leaveMeet(id: string, user: User) {
+    return this.meetRepository.leaveMeet(id, user);
+  }
+
   async createMeet(
     meetCreationDto: MeetCreationDto,
     user: User,

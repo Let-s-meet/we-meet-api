@@ -58,6 +58,14 @@ export class MeetsController {
     return this.meetService.joinMeet(id, user);
   }
 
+  @Get('/:id/leave')
+  leaveMeet(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @GetUser() user: User,
+  ) {
+    return this.meetService.leaveMeet(id, user);
+  }
+
   @Patch('/:id/status')
   updateMeetStatus(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
