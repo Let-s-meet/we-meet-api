@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from 'src/users/orm/user.repository';
 import { AuthCredentialsLoginDto } from './dto/auth-credentials-login.dto';
 import { AuthCredentialsRegisterDto } from './dto/auth-credentials-register.dto';
+import { TokenVerificationDto } from './dto/token-verification.dto';
 import { JwtPayload } from './interface/jwt-payload.interface';
 
 @Injectable()
@@ -24,7 +25,7 @@ export class AuthService {
 
   async login(
     authCredentialsLoginDto: AuthCredentialsLoginDto,
-  ): Promise<{ userData: any; accessToken: string }> {
+  ): Promise<{ accessToken: string }> {
     const valid = await this.userRepository.validateUserPassword(
       authCredentialsLoginDto,
     );
@@ -49,11 +50,6 @@ export class AuthService {
     const payload: JwtPayload = { email };
     const accessToken = await this.jwtService.sign(payload);
 
-    const userData = {
-      id: user.id,
-      username: user.username,
-      email: email,
-    };
-    return { userData, accessToken };
+    return { accessToken: accessToken };
   }
 }

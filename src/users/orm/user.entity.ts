@@ -22,7 +22,7 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   public updated: Date;
 
-  @Column({ select: false, unique: true })
+  @Column({ unique: true })
   public email: string;
 
   @Column({ unique: true })
