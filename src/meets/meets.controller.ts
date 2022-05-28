@@ -23,7 +23,7 @@ import { Meet } from './orm/meet.entity';
 import { MeetStatusValidationPipe } from './pipes/meet-status-validation.pipe';
 
 @Controller('meets')
-// @UseGuards(AuthGuard())
+@UseGuards(AuthGuard())
 export class MeetsController {
   constructor(private meetService: MeetsService) {}
 
