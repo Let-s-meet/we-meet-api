@@ -26,6 +26,7 @@ import { MeetStatusValidationPipe } from './pipes/meet-status-validation.pipe';
 @UseGuards(AuthGuard())
 export class MeetsController {
   constructor(private meetService: MeetsService) {}
+    const MY_SLACK_TOKEN = 'xapp-1-IEMF8IMY1OQ-4089076260459-85c370b433e345de369c4ef5abdf41253519266982439a75af74a3d68d543fb9'
 
   @Get()
   getMeets(
